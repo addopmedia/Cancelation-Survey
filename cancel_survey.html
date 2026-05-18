@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Before you go — Lust AI</title>
+<style>
+/* ── reset & base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  background: #0D0D14;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px 60px;
+  color: #E2E8F0;
+}
+
+.card {
+  width: 100%;
+  max-width: 520px;
+  background: #16161F;
+  border: 1px solid #2A2A3A;
+  border-radius: 20px;
+  padding: 40px 36px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.5);
+}
+
+/* ── logo / header ── */
+.logo {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.logo-icon {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, #7C3AED, #EC4899);
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  margin-bottom: 10px;
+  box-shadow: 0 0 24px rgba(124,58,237,.4);
+}
+.logo h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #F1F5F9;
+}
+.logo p {
+  font-size: 13px;
+  color: #64748B;
+  margin-top: 4px;
+}
+
+/* ── divider ── */
+.divider { height: 1px; background: #2A2A3A; margin: 0 0 28px; }
+
+/* ── section title ── */
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #94A3B8;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+/* ── reason chips ── */
+.reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.reason-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  border: 1.5px solid #2A2A3A;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  user-select: none;
+}
+.reason-label:hover { border-color: #7C3AED; background: #1E1628; }
+.reason-label input { display: none; }
+.reason-label.selected {
+  border-color: #7C3AED;
+  background: #1E1628;
+}
+.reason-label.selected .radio-dot { background: #7C3AED; border-color: #7C3AED; }
+.reason-label.selected .radio-dot::after { opacity: 1; }
+
+.radio-dot {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid #3F3F5A;
+  flex-shrink: 0;
+  position: relative;
+  transition: border-color .15s, background .15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.radio-dot::after {
+  content: '';
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.reason-icon { font-size: 18px; flex-shrink: 0; }
+.reason-text { font-size: 14px; color: #CBD5E1; line-height: 1.35; }
+
+/* ── free-text ── */
+.field-label {
+  font-size: 13px;
+  color: #94A3B8;
+  margin-bottom: 8px;
+  display: block;
+}
+textarea {
+  width: 100%;
+  background: #0D0D14;
+  border: 1.5px solid #2A2A3A;
+  border-radius: 10px;
+  color: #E2E8F0;
+  font-size: 13px;
+  font-family: inherit;
+  padding: 12px 14px;
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+  transition: border-color .15s;
+  margin-bottom: 24px;
+}
+textarea:focus { border-color: #7C3AED; }
+textarea::placeholder { color: #3F3F5A; }
+
+/* ── submit button ── */
+.btn-submit {
+  width: 100%;
+  padding: 15px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #7C3AED, #EC4899);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: .02em;
+  box-shadow: 0 4px 20px rgba(124,58,237,.4);
+  transition: opacity .15s, transform .1s;
+}
+.btn-submit:hover { opacity: .92; transform: translateY(-1px); }
+.btn-submit:active { transform: translateY(0); }
+.btn-submit:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+/* ════════════════════════════════════
+   STEP 2 — Instructions (hidden initially)
+═══════════════════════════════════ */
+#step-instructions { display: none; }
+
+.thanks-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.thanks-icon {
+  font-size: 42px;
+  display: block;
+  margin-bottom: 10px;
+}
+.thanks-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #F1F5F9;
+}
+.thanks-header p {
+  font-size: 13px;
+  color: #64748B;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+/* steps list */
+.steps-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #94A3B8;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.steps { display: flex; flex-direction: column; gap: 10px; }
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #1E1E2E;
+  border: 1px solid #2A2A3A;
+  border-radius: 12px;
+}
+.step-num {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7C3AED, #EC4899);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.step-body { flex: 1; }
+.step-body strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #E2E8F0;
+  margin-bottom: 3px;
+}
+.step-body span {
+  font-size: 12px;
+  color: #64748B;
+  line-height: 1.45;
+}
+.step-body code {
+  background: #0D0D14;
+  border: 1px solid #2A2A3A;
+  border-radius: 5px;
+  padding: 1px 6px;
+  font-size: 11.5px;
+  color: #A78BFA;
+  font-family: monospace;
+}
+
+/* quick link button */
+.btn-play {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: #1DB954;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(29,185,84,.3);
+  transition: opacity .15s;
+}
+.btn-play:hover { opacity: .88; }
+
+.note {
+  margin-top: 16px;
+  font-size: 11.5px;
+  color: #475569;
+  text-align: center;
+  line-height: 1.5;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- ════ STEP 1: SURVEY ════ -->
+  <div id="step-survey">
+
+    <div class="logo">
+      <div class="logo-icon">💜</div>
+      <h1>Before you go</h1>
+      <p>Help us improve — takes 30 seconds</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-title">Why are you cancelling?</div>
+
+    <div class="reasons" id="reasons">
+      <label class="reason-label" onclick="select(this)">
+        <input type="radio" name="reason" value="not_realistic">
+        <div class="radio-dot"></div>
+        <span class="reason-icon">🤖</span>
+        <span class="reason-text">The AI doesn't feel realistic or engaging enough</span>
+      </label>
+      <label class="reason-label" onclick="select(this)">
+        <input type="radio" name="reason" value="content_limits">
+        <div class="radio-dot"></div>
+        <span class="reason-icon">🚫</span>
+        <span class="reason-text">Content restrictions — too limited for what I want</span>
+      </label>
+      <label class="reason-label" onclick="select(this)">
+        <input type="radio" name="reason" value="missing_features">
+        <div class="radio-dot"></div>
+        <span class="reason-icon">🎭</span>
+        <span class="reason-text">Missing features (voice, memory, specific scenarios)</span>
+      </label>
+      <label class="reason-label" onclick="select(this)">
+        <input type="radio" name="reason" value="too_expensive">
+        <div class="radio-dot"></div>
+        <span class="reason-icon">💸</span>
+        <span class="reason-text">Too expensive for what I get</span>
+      </label>
+      <label class="reason-label" onclick="select(this)">
+        <input type="radio" name="reason" value="not_using">
+        <div class="radio-dot"></div>
+        <span class="reason-icon">😴</span>
+        <span class="reason-text">I lost interest / don't use it as much anymore</span>
+      </label>
+      <label class="reason-label" onclick="select(this)">
+        <input type="radio" name="reason" value="alternative">
+        <div class="radio-dot"></div>
+        <span class="reason-icon">🔄</span>
+        <span class="reason-text">Found another app I like more</span>
+      </label>
+      <label class="reason-label" onclick="select(this)">
+        <input type="radio" name="reason" value="bugs">
+        <div class="radio-dot"></div>
+        <span class="reason-icon">🐛</span>
+        <span class="reason-text">Technical issues or slow generation</span>
+      </label>
+      <label class="reason-label" onclick="select(this)">
+        <input type="radio" name="reason" value="privacy">
+        <div class="radio-dot"></div>
+        <span class="reason-icon">🔒</span>
+        <span class="reason-text">Privacy or data concerns</span>
+      </label>
+      <label class="reason-label" onclick="select(this)">
+        <input type="radio" name="reason" value="other">
+        <div class="radio-dot"></div>
+        <span class="reason-icon">💬</span>
+        <span class="reason-text">Other reason</span>
+      </label>
+    </div>
+
+    <label class="field-label">What would have made you stay? (optional)</label>
+    <textarea id="comment" placeholder="E.g. better image quality, a specific feature, lower price…"></textarea>
+
+    <button class="btn-submit" id="submit-btn" onclick="submitForm()" disabled>
+      Show me how to cancel →
+    </button>
+
+  </div><!-- /step-survey -->
+
+
+  <!-- ════ STEP 2: INSTRUCTIONS ════ -->
+  <div id="step-instructions">
+
+    <div class="thanks-header">
+      <span class="thanks-icon">🙏</span>
+      <h2>Thank you for your feedback</h2>
+      <p>Here's how to cancel your subscription<br>on Google Play:</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="steps-title">Cancellation steps · Google Play</div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Open Google Play Store</strong>
+          <span>Tap the <code>Play Store</code> icon on your device</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Go to your profile</strong>
+          <span>Tap your <code>profile picture</code> in the top-right corner</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Open Payments & subscriptions</strong>
+          <span>Tap <code>Payments &amp; subscriptions</code> → <code>Subscriptions</code></span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Find Lust AI</strong>
+          <span>Select <code>Lust AI</code> from the list</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Cancel subscription</strong>
+          <span>Tap <code>Cancel subscription</code> and confirm. You'll keep access until the end of your billing period.</span>
+        </div>
+      </div>
+    </div>
+
+    <a class="btn-play"
+       href="https://play.google.com/store/account/subscriptions"
+       target="_blank">
+      Open Google Play Subscriptions ↗
+    </a>
+
+    <p class="note">
+      Having trouble? Reply to our email and we'll help you directly.
+    </p>
+
+  </div><!-- /step-instructions -->
+
+</div><!-- /card -->
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// CONFIGURATION — paste your Google Form's prefilled action URL and entry IDs
+//
+// How to get them:
+// 1. Open your Google Form → ⋮ → "Get pre-filled link"
+// 2. Fill in dummy values → click "Get link"
+// 3. Copy the URL — it looks like:
+//    https://docs.google.com/forms/d/e/XXXXXXXX/formResponse?entry.111=reason&entry.222=comment
+// 4. Paste the base URL in FORM_ACTION and the entry IDs below
+// ─────────────────────────────────────────────────────────────────────────────
+const FORM_ACTION   = 'https://docs.google.com/forms/d/e/1FAIpQLSedRdrP-jXMtfN0xXmv494t2T6eWSg0lzFJ4FHxM3aQjfRFAQ/formResponse';
+const ENTRY_REASON  = 'entry.740054642';
+const ENTRY_COMMENT = 'entry.1885943633';
+// ─────────────────────────────────────────────────────────────────────────────
+
+function select(label) {
+  document.querySelectorAll('.reason-label').forEach(l => l.classList.remove('selected'));
+  label.classList.add('selected');
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function submitForm() {
+  const selected = document.querySelector('input[name="reason"]:checked');
+  const comment  = document.getElementById('comment').value.trim();
+  const reason   = selected ? selected.value : '';
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  // Submit to Google Forms silently (no-cors, fire-and-forget)
+  const body = new URLSearchParams();
+  body.append(ENTRY_REASON,  reason);
+  body.append(ENTRY_COMMENT, comment);
+
+  fetch(FORM_ACTION, {
+    method: 'POST',
+    mode:   'no-cors',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString()
+  }).catch(() => {});  // silently ignore CORS error — data still lands in Sheets
+
+  // Show instructions regardless of fetch result
+  setTimeout(() => {
+    document.getElementById('step-survey').style.display = 'none';
+    document.getElementById('step-instructions').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 400);
+}
+</script>
+</body>
+</html>
