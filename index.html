@@ -287,56 +287,56 @@ textarea::placeholder { color: #3F3F5A; }
     <div class="section-title">Why are you cancelling?</div>
 
     <div class="reasons" id="reasons">
-      <label class="reason-label" onclick="select(this)">
-        <input type="radio" name="reason" value="not_realistic">
+      <label class="reason-label" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="The AI doesn't feel realistic or engaging enough">
         <div class="radio-dot"></div>
         <span class="reason-icon">🤖</span>
         <span class="reason-text">The AI doesn't feel realistic or engaging enough</span>
       </label>
-      <label class="reason-label" onclick="select(this)">
-        <input type="radio" name="reason" value="content_limits">
+      <label class="reason-label" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="Content restrictions — too limited for what I want">
         <div class="radio-dot"></div>
         <span class="reason-icon">🚫</span>
         <span class="reason-text">Content restrictions — too limited for what I want</span>
       </label>
-      <label class="reason-label" onclick="select(this)">
-        <input type="radio" name="reason" value="missing_features">
+      <label class="reason-label" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="Missing features (voice, memory, specific scenarios)">
         <div class="radio-dot"></div>
         <span class="reason-icon">🎭</span>
         <span class="reason-text">Missing features (voice, memory, specific scenarios)</span>
       </label>
-      <label class="reason-label" onclick="select(this)">
-        <input type="radio" name="reason" value="too_expensive">
+      <label class="reason-label" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="Too expensive for what I get">
         <div class="radio-dot"></div>
         <span class="reason-icon">💸</span>
         <span class="reason-text">Too expensive for what I get</span>
       </label>
-      <label class="reason-label" onclick="select(this)">
-        <input type="radio" name="reason" value="not_using">
+      <label class="reason-label" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="I lost interest / don't use it as much anymore">
         <div class="radio-dot"></div>
         <span class="reason-icon">😴</span>
         <span class="reason-text">I lost interest / don't use it as much anymore</span>
       </label>
-      <label class="reason-label" onclick="select(this)">
-        <input type="radio" name="reason" value="alternative">
+      <label class="reason-label" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="Found another app I like more">
         <div class="radio-dot"></div>
         <span class="reason-icon">🔄</span>
         <span class="reason-text">Found another app I like more</span>
       </label>
-      <label class="reason-label" onclick="select(this)">
-        <input type="radio" name="reason" value="bugs">
+      <label class="reason-label" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="Technical issues or slow generation">
         <div class="radio-dot"></div>
         <span class="reason-icon">🐛</span>
         <span class="reason-text">Technical issues or slow generation</span>
       </label>
-      <label class="reason-label" onclick="select(this)">
-        <input type="radio" name="reason" value="privacy">
+      <label class="reason-label" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="Privacy or data concerns">
         <div class="radio-dot"></div>
         <span class="reason-icon">🔒</span>
         <span class="reason-text">Privacy or data concerns</span>
       </label>
-      <label class="reason-label" onclick="select(this)">
-        <input type="radio" name="reason" value="other">
+      <label class="reason-label" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="Other reason">
         <div class="radio-dot"></div>
         <span class="reason-icon">💬</span>
         <span class="reason-text">Other reason</span>
@@ -418,23 +418,23 @@ textarea::placeholder { color: #3F3F5A; }
 
 </div><!-- /card -->
 
-<script>
-// ─────────────────────────────────────────────────────────────────────────────
-// CONFIGURATION — paste your Google Form's prefilled action URL and entry IDs
-//
-// How to get them:
-// 1. Open your Google Form → ⋮ → "Get pre-filled link"
-// 2. Fill in dummy values → click "Get link"
-// 3. Copy the URL — it looks like:
-//    https://docs.google.com/forms/d/e/XXXXXXXX/formResponse?entry.111=reason&entry.222=comment
-// 4. Paste the base URL in FORM_ACTION and the entry IDs below
-// ─────────────────────────────────────────────────────────────────────────────
-const FORM_ACTION   = 'https://docs.google.com/forms/d/e/1FAIpQLSedRdrP-jXMtfN0xXmv494t2T6eWSg0lzFJ4FHxM3aQjfRFAQ/formResponse';
-const ENTRY_REASON  = 'entry.740054642';
-const ENTRY_COMMENT = 'entry.1885943633';
-// ─────────────────────────────────────────────────────────────────────────────
+<iframe name="hidden_iframe" style="display:none"></iframe>
+<form
+  id="gform"
+  action="https://docs.google.com/forms/d/e/1FAIpQLSedRdrP-jXMtfN0xXmv494t2T6eWSg0lzFJ4FHxM3aQjfRFAQ/formResponse"
+  method="POST"
+  target="hidden_iframe"
+  style="display:none">
+  <input type="hidden" name="entry.740054642"  id="f-reason">
+  <input type="hidden" name="entry.1885943633" id="f-comment">
+</form>
 
-function select(label) {
+<script>
+// ── значения value на radio-кнопках должны совпадать с текстом опций в Google Form ──
+// Проверьте через: Google Form → ⋮ → Get pre-filled link → выберите вариант → скопируйте URL
+// В URL будет entry.740054642=EXACT+OPTION+TEXT — это и есть нужное value
+
+function selectReason(label) {
   document.querySelectorAll('.reason-label').forEach(l => l.classList.remove('selected'));
   label.classList.add('selected');
   document.getElementById('submit-btn').disabled = false;
@@ -443,30 +443,24 @@ function select(label) {
 function submitForm() {
   const selected = document.querySelector('input[name="reason"]:checked');
   const comment  = document.getElementById('comment').value.trim();
-  const reason   = selected ? selected.value : '';
+
+  if (!selected) return;
 
   const btn = document.getElementById('submit-btn');
   btn.disabled = true;
   btn.textContent = 'Sending…';
 
-  // Submit to Google Forms silently (no-cors, fire-and-forget)
-  const body = new URLSearchParams();
-  body.append(ENTRY_REASON,  reason);
-  body.append(ENTRY_COMMENT, comment);
+  // Заполняем скрытую форму и отправляем через iframe (надёжнее no-cors fetch)
+  document.getElementById('f-reason').value  = selected.value;
+  document.getElementById('f-comment').value = comment;
+  document.getElementById('gform').submit();
 
-  fetch(FORM_ACTION, {
-    method: 'POST',
-    mode:   'no-cors',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: body.toString()
-  }).catch(() => {});  // silently ignore CORS error — data still lands in Sheets
-
-  // Show instructions regardless of fetch result
+  // Показываем инструкцию
   setTimeout(() => {
     document.getElementById('step-survey').style.display = 'none';
     document.getElementById('step-instructions').style.display = 'block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, 400);
+  }, 500);
 }
 </script>
 </body>
